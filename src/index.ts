@@ -8,8 +8,12 @@ app.get('/', function (req, res) {
 app.use('/health', (req, res) => {
   if (state.isShutdown) {
     res.status(500).send('respon not ok');
+  console.log('respon not ok');
+
   } 
   res.status(200).send('respon ok');
+  console.log('respon ok');
+  
 });
 
 //Graceful shutdown
@@ -31,7 +35,7 @@ const gracefulShutdown = () => {
 //listen for TERM signal eg. kill
 process.on('SIGTERM',() => {
     console.log('case SIGTERM');
-    gracefulShutdown
+    gracefulShutdown()
 })
 
 //listen for INT signal eg. ctrl + c
@@ -42,5 +46,5 @@ process.on('SIGINT', () => {
 
 
 let server = app.listen(3000, function () {
-  console.log('Example app listening on port 3000')
+  console.log('Example app listening on port 3000, on process id =', process.pid)
 })
