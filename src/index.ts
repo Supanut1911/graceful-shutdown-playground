@@ -1,3 +1,4 @@
+import { log } from 'console';
 import express from 'express'
 const app = express()
 const state = { isShutdown: false };
@@ -10,6 +11,34 @@ app.use('/health', (req, res) => {
   } 
   res.status(200).send('respon ok');
 });
+
+//Graceful shutdown
+const gracefulShutdown = () => {
+    state.isShutdown = true
+    console.log('Got SIGTERM. Graceful shutdown start', new Date().toISOString());
+    server.close( () => {
+        console.log('Close out remaining connections.');
+        process.exit()
+    })
+
+    setTimeout( ()=> {
+        console.error('Could not close connections in time, forcefully shutting down')
+        process.exit() 
+    }, 10 * 1000)
+}
+
+//listen for TERM signal eg. kill
+process.on('SIGTERM',() => {
+    console.log('case SIGTERM');
+    gracefulShutdown
+})
+
+//listen for INT signal eg. ctrl + c
+process.on('SIGINT', () => {
+    console.log('case SIGINT');
+    gracefulShutdown()
+})
+
 
 let server = app.listen(3000, function () {
   console.log('Example app listening on port 3000')
