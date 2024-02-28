@@ -16,6 +16,7 @@ app.use('/health', (req, res) => {
 const gracefulShutdown = () => {
     state.isShutdown = true
     console.log('Got SIGTERM. Graceful shutdown start', new Date().toISOString());
+    // Additional cleanup tasks go here, e.g., close database connection
     server.close( () => {
         console.log('Close out remaining connections.');
         process.exit()
